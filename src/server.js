@@ -365,6 +365,44 @@ app.post("/send-to-student", async (req, res) => {
 });
 
 
+//ver 11
+
+const express = require('express');
+// const app = express();
+const cors = require('cors');
+const mongoose = require('mongoose');
+require('dotenv').config();
+
+app.use(cors());
+app.use(express.json());
+app.use(express.static('public')); // ✅ This serves login.html, student.html, etc.
+
+mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log("MongoDB connected"))
+  .catch(err => console.error(err));
+
+// your routes like /login, /appointments, /upload-session-notes etc go here...
+
+// ✅ Final catch-all route for React-style routing (if needed)
+app.get('*', (req, res) => {
+  res.sendFile(__dirname + '/public/login.html');
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 
 
+
+// Serve frontend files
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Example API route
+app.get('/api/health', (req, res) => {
+  res.send('API is working');
+});
+
+// Catch-all route to serve login.html by default
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
