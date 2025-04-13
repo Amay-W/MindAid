@@ -1,0 +1,202 @@
+/* --- Global Styles --- */
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f6fb;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* --- Header --- */
+header {
+    background-color: #ffffff;
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+header .logo {
+    display: flex;
+    align-items: center;
+}
+
+header .logo i {
+    font-size: 2em;
+    color: #007bff;
+    margin-right: 10px;
+}
+
+header .logo h1 {
+    color: #007bff;
+    font-size: 2em;
+    margin: 0;
+    font-weight: bold;
+}
+
+header .top-nav {
+    display: flex;
+    align-items: center;
+}
+
+header .top-nav img {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+}
+
+/* --- Main Layout --- */
+.main-container {
+    display: flex;
+    height: calc(100vh - 80px);
+    overflow: hidden;
+}
+
+.side-nav {
+    width: 260px;
+    background: #003366;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    padding-top: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+.side-nav a {
+    text-decoration: none;
+    color: white;
+    padding: 15px 20px;
+    display: block;
+    font-size: 1.1em;
+    transition: background-color 0.3s;
+}
+
+.side-nav a:hover {
+    background-color: #0056b3;
+}
+
+.side-nav a.active {
+    background-color: #004080;
+    font-weight: bold;
+}
+
+.content {
+    flex: 1;
+    padding: 40px;
+    overflow-y: auto;
+    background-color: #f4f6fb;
+}
+
+/* --- Title --- */
+.dashboard-title {
+    font-size: 2.2em;
+    margin-bottom: 20px;
+    color: #003366;
+    font-family: 'Georgia', serif;
+}
+
+/* --- Card Section --- */
+.section-card {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 30px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+    margin-bottom: 30px;
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+.section-card h5 {
+    color: #003366;
+    font-family: 'Georgia', serif;
+    font-size: 1.4em;
+    margin-bottom: 20px;
+}
+
+/* --- File/Note Area --- */
+textarea, input[type="text"], input[type="file"], select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 0.95em;
+    background-color: #f9fcff;
+    transition: border-color 0.3s ease;
+    margin-bottom: 15px;
+}
+
+textarea:focus, input:focus, select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0,123,255,0.15);
+}
+
+/* --- Buttons --- */
+.btn {
+    padding: 10px 20px;
+    font-weight: 500;
+    font-size: 0.95em;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    border: none;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #565e64;
+}
+
+/* --- Table Styling --- */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9em;
+    margin-top: 20px;
+}
+
+table th, table td {
+    border: 1px solid #dee2e6;
+    padding: 10px;
+    text-align: left;
+}
+
+table th {
+    background-color: #003366;
+    color: white;
+}
+
+table tr:nth-child(even) {
+    background-color: #f1f4f8;
+}
+
+table tr:hover {
+    background-color: #e6f0ff;
+}
+
+/* --- Animation --- */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}

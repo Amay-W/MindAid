@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Counselor Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.7.16/dist/vue.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="css/counselor.css"/>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="logo">
+      <i class="fas fa-heartbeat"></i>
+      <h1>MindAid</h1>
+    </div>
+    <div class="top-nav">
+      <img src="./assets/mitzi.jpg" alt="Ms. Mitzi" class="profile-pic"/>
+      <button onclick="logout()" aria-label="Logout">
+        <i class="fas fa-sign-out-alt"></i>
+      </button>
+      <div class="profile-menu" id="profile-menu">
+        <div class="menu-header">
+          <h3>{{ loggedInUser.fullName }}</h3>
+          <span class="username">@{{ loggedInUser.username }}</span>
+          <span>Counselor, Age: {{ calculateAge(loggedInUser.dob) }}</span>
+        </div>
+        <div class="menu-body">
+          <button onclick="viewProfile()">View More Profile Info</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="main-container">
+    <nav class="side-nav">
+      <a href="#" :class="{ active: currentView === 'dashboard' }" @click.prevent="currentView = 'dashboard'">Dashboard</a>
+      <a href="#" :class="{ active: currentView === 'appointments' }" @click.prevent="currentView = 'appointments'">Appointments</a>
+      <a href="#" :class="{ active: currentView === 'session-notes' }" @click.prevent="currentView = 'session-notes'">Session Notes</a>
+      <a href="#" :class="{ active: currentView === 'insights' }" @click.prevent="currentView = 'insights'">Insights</a>
+      <a href="#" :class="{ active: currentView === 'resources' }" @click.prevent="currentView = 'resources'">Resources</a>
+      <a href="#" :class="{ active: currentView === 'profile' }" @click.prevent="currentView = 'profile'">Profile</a>
+    </nav>
+
+    <div class="content">
+      <!-- Dashboard -->
+      <div v-show="currentView === 'dashboard'">
+        <h2 class="dashboard-title">Welcome, Counselor</h2>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header">Upcoming Appointments</div>
+              <div class="card-body">
+                <p>{{ dashboardCounts.appointments }} Appointments Scheduled for This Week</p>
+                <button class="btn btn-primary" @click="currentView = 'appointments'">Manage Appointments</button>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header">Session Notes</div>
+              <div class="card-body">
+                <p>{{ dashboardCounts.sessionNotes }} Session Notes Added</p>
+                <button class="btn btn-primary" @click="currentView = 'session-notes'">View Notes</button>
+              </div>
+            </div>
+          </div>
+
+
+          <div class="col-md-6 mb-4">
+            <div class="chart-container">
+              <h5>Top Concerns (Session Notes)</h5>
+              <canvas id="concernsChart"></canvas>
+            </div>
+          </div>
+          <div class="col-md-6 mb-4">
+            <div class="chart-container">
+              <h5>Gender Distribution</h5>
+              <canvas id="genderChart"></canvas>
+            </div>
+          </div>
+
+
+
+        </div>
+      </div>
+
+      <!-- Appointments -->
+      <div v-show="currentView === 'appointments'">
+        <h2 class="dashboard-title">Appointments</h2>
+
+        <div class="mb-4">
+          <h5 class="mb-3">Add Appointment</h5>
+          <table class="table table-bordered table-sm bg-white">
+            <thead class="table-light">
+              <tr>
+                <th>Date</th><th>Time</th><th>Student Name</th><th>MISIS</th><th>Contact Info</th><th>Purpose</th><th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input v-model="appointmentForm.date" type="date" class="form-control form-control-sm" required></td>
+                <td><input v-model="appointmentForm.time" type="time" class="form-control form-control-sm" required></td>
+                <td><input v-model="appointmentForm.studentName" type="text" class="form-control form-control-sm" placeholder="Student Name" required></td>
+                <td><input v-model="appointmentForm.misis" type="text" class="form-control form-control-sm" placeholder="MISIS" required></td>
+                <td><input v-model="appointmentForm.contactInfo" type="text" class="form-control form-control-sm" placeholder="Contact Info" required></td>
+                <td><input v-model="appointmentForm.purpose" type="text" class="form-control form-control-sm" placeholder="Purpose" required></td>
+                <td><button @click="addAppointment" class="btn btn-success btn-sm w-100"><i class="fas fa-plus"></i></button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div v-if="appointments.length > 0">
+          <h5 class="mt-4">Upcoming Appointments</h5>
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Date</th><th>Time</th><th>Student Name</th><th>MISIS</th><th>Contact Info</th><th>Purpose</th><th>Counselor</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="appt in appointments" :key="appt._id">
+                <td>{{ appt.date }}</td>
+                <td>{{ appt.time }}</td>
+                <td>{{ appt.studentName }}</td>
+                <td>{{ appt.misis }}</td>
+                <td>{{ appt.contactInfo }}</td>
+                <td>{{ appt.purpose }}</td>
+                <td>{{ appt.counselor }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Session Notes -->
+      <div v-show="currentView === 'session-notes'">
+        
+          
+
+
+
+
+        <h2 class="dashboard-title">Session Notes</h2>
+
+        <button v-if="!dataUploaded" class="btn btn-primary mb-3" @click="showFileUploadSection">Import Data</button>
+        <button class="btn btn-secondary ms-2 mb-3" @click="enableManualEntry">Start from Scratch</button>
+
+
+        <div v-if="currentView === 'session-notes' && showManualSessionNotes && sessionNotes.length > 0">
+            <h5 class="mt-4">Manual Session Notes</h5>
+            <table class="table table-bordered table-sm bg-white">
+              <thead class="table-light">
+                <tr>
+                  <th>Date</th><th>Student Name</th><th>Session</th><th>Week</th><th>Gender</th><th>MISIS</th>
+                  <th>Year</th><th>Nationality</th><th>Methods</th><th>Concern</th><th>Summary</th><th>Notes</th><th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(note, index) in sessionNotes" :key="index">
+                  <td><input v-model="note.Date" type="date" class="form-control form-control-sm" /></td>
+                  <td><input v-model="note['Student Name']" type="text" class="form-control form-control-sm" /></td>
+                  <td><input v-model="note.Session" type="text" class="form-control form-control-sm" /></td>
+                  <td><input v-model="note.Week" type="text" class="form-control form-control-sm" /></td>
+                  <td><input v-model="note.Gender" type="text" class="form-control form-control-sm" /></td>
+                  <td><input v-model="note.MISIS" type="text" class="form-control form-control-sm" /></td>
+                  <td><input v-model="note.Year" type="text" class="form-control form-control-sm" /></td>
+                  <td><input v-model="note.Nationality" type="text" class="form-control form-control-sm" /></td>
+                  <td><input v-model="note['Counselling Methods Used']" type="text" class="form-control form-control-sm" /></td>
+                  <td><input v-model="note['Area of Concern']" type="text" class="form-control form-control-sm" /></td>
+                  <td><input v-model="note['Summary of Discussion']" type="text" class="form-control form-control-sm" /></td>
+                  <td><input v-model="note.Notes" type="text" class="form-control form-control-sm" /></td>
+                  <td><button class="btn btn-danger btn-sm" @click="removeSessionNote(index)"><i class="fas fa-trash"></i></button></td>
+                </tr>
+              </tbody>
+            </table>
+          
+            <button class="btn btn-secondary me-2" @click="addEmptySessionNote">Add Row</button>
+            <button class="btn btn-success" @click="saveManualSessionNotes">Save Notes</button>
+            <button class="btn btn-secondary" @click="exportManualToCSV">Export as CSV</button>
+          </div>
+          
+
+
+
+
+
+
+        <div v-if="FileUploadSection" class="mt-3 fade show">
+          <input type="file" @change="onFileSelected" accept=".csv" class="form-control mb-2"/>
+          <button class="btn btn-success" @click="uploadSessionData">Upload</button>
+        </div>
+
+        <div v-if="showUploadActions" class="alert alert-success">
+          <strong>Data uploaded successfully!</strong><br>
+          <button class="btn btn-outline-primary mt-2" @click="pushDataToTable">Push to Page</button>
+          <button class="btn btn-outline-danger mt-2 ms-2" @click="deleteUploadedData">Delete Uploaded Data</button>
+        </div>
+
+
+
+
+
+
+        <div v-if="currentView === 'session-notes' && showEditableTable">
+        <h5 class="mt-4">Editable Session Notes</h5>
+        <table class="table table-bordered table-sm bg-white">
+          <thead class="table-light">
+            <tr>
+              <th>Date</th><th>Student Name</th><th>Session</th><th>Week</th><th>Gender</th><th>MISIS</th>
+              <th>Year</th><th>Nationality</th><th>Methods</th><th>Concern</th><th>Summary</th><th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(note, index) in editableSessionNotes" :key="index">
+              <td><input v-model="note.Date" type="text" class="form-control form-control-sm" /></td>
+              <td><input v-model="note['Student Name']" type="text" class="form-control form-control-sm" /></td>
+              <td><input v-model="note.Session" type="text" class="form-control form-control-sm" /></td>
+              <td><input v-model="note.Week" type="text" class="form-control form-control-sm" /></td>
+              <td><input v-model="note.Gender" type="text" class="form-control form-control-sm" /></td>
+              <td><input v-model="note.MISIS" type="text" class="form-control form-control-sm" /></td>
+              <td><input v-model="note.Year" type="text" class="form-control form-control-sm" /></td>
+              <td><input v-model="note.Nationality" type="text" class="form-control form-control-sm" /></td>
+              <td><input v-model="note['Counselling Methods Used']" type="text" class="form-control form-control-sm" /></td>
+              <td><input v-model="note['Area of Concern']" type="text" class="form-control form-control-sm" /></td>
+              <td><input v-model="note['Summary of Discussion']" type="text" class="form-control form-control-sm" /></td>
+              <td><input v-model="note.Notes" type="text" class="form-control form-control-sm" /></td>
+              <td>
+                <button class="btn btn-danger btn-sm" @click="removeEditableNote(index)">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+            <button class="btn btn-secondary" @click="addEditableNote">
+              <i class="fas fa-plus"></i> Add Row
+            </button>
+          </tbody>
+        </table>
+      
+        <div class="d-flex gap-2 mt-3">
+          <button class="btn btn-success" @click="saveEditedNotes">Save to MongoDB</button>
+          <button class="btn btn-secondary" @click="exportToCSV">Export as CSV</button>
+          <button class="btn btn-danger" @click="clearEditableTable">Delete Table</button>
+        </div>
+      </div>
+      
+
+</div>
+
+  
+
+     <!-- Insights -->
+  <div v-show="currentView === 'insights'">
+    <h2 class="dashboard-title">Insights</h2>
+
+    <div class="row">
+      <div class="col-md-6 mb-4">
+        <div class="chart-container">
+          <h5>Upcoming Appointment By Purpose</h5>
+          <canvas id="appointmentsChart"></canvas>
+        </div>
+      </div>
+      <div class="col-md-6 mb-4">
+        <div class="chart-container">
+          <h5>Top Concerns (Session Notes)</h5>
+          <canvas id="concernsChartInsights"></canvas>
+        </div>
+      </div>
+      <div class="col-md-6 mb-4">
+        <div class="chart-container">
+          <h5>Gender Distribution</h5>
+          <canvas id="genderChartInsights"></canvas>
+        </div>
+      </div>
+      <div class="col-md-6 mb-4">
+        <div class="chart-container">
+          <h5>Sessions by Year Level</h5>
+          <canvas id="yearChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <hr>
+
+    <h4 class="mt-5">Chart Builder</h4>
+    <div class="row">
+      <div class="col-md-4">
+        <label>Chart Type</label>
+        <select class="form-control" v-model="builder.type">
+          <option value="bar">Bar</option>
+          <option value="line">Line</option>
+          <option value="pie">Pie</option>
+        </select>
+      </div>
+      
+      <div class="col-md-4">
+        <label>X-Axis Field</label>
+        <select class="form-control" v-model="builder.x">
+          <option v-for="option in fieldOptions" :key="option" :value="option">{{ option }}</option>
+        </select>
+      </div>
+      
+      <div class="col-md-4" v-if="builder.type !== 'pie'">
+        <label>Y-Axis Field</label>
+        <select class="form-control" v-model="builder.y">
+          <option v-for="option in fieldOptions" :key="option" :value="option">{{ option }}</option>
+        </select>
+      </div>
+      
+      <div class="col-md-4 mt-3" v-if="builder.type !== 'pie'">
+        <label>Aggregation</label>
+        <select class="form-control" v-model="builder.agg">
+          <option value="count">Count</option>
+          <option value="sum">Sum</option>
+          <option value="avg">Average</option>
+        </select>
+      </div>
+
+    <button class="btn btn-primary mt-3" @click="generateCustomChart">Generate Chart</button>
+
+    <div class="chart-container mt-4" v-show="customChartVisible">
+      <canvas id="customChart"></canvas>
+    </div>
+  </div>
+
+  </div>
+
+
+  
+
+
+
+<!-- Resources -->
+<div v-show="currentView === 'resources'">
+  <h2 class="dashboard-title">Resources</h2>
+
+  <!-- 📚 Uploaded Resources Section -->
+  <div class="section-card">
+    <h5>📚 Uploaded Resources</h5>
+    <ul>
+      <li v-for="r in resources">
+        <strong>{{ r.title }}</strong> - {{ r.description }} 
+        <span v-if="r.type === 'Link'">(<a :href="r.url" target="_blank">Link</a>)</span>
+        <span v-if="r.type === 'Note'">(<em>{{ r.note }}</em>)</span>
+        <span v-if="r.type === 'File'">(<a :href="r.fileUrl" target="_blank">Download</a>)</span>
+      </li>
+    </ul>
+
+    <h6 class="mt-3">Add New Resource</h6>
+    <input v-model="resourceForm.title" class="form-control mb-2" placeholder="Title" />
+    <input v-model="resourceForm.description" class="form-control mb-2" placeholder="Description" />
+
+    <select v-model="resourceForm.type" class="form-control mb-2">
+      <option>Link</option>
+      <option>File</option>
+      <option>Note</option>
+    </select>
+
+    <input v-if="resourceForm.type === 'Link'" v-model="resourceForm.url" class="form-control mb-2" placeholder="Paste URL here" />
+    <textarea v-if="resourceForm.type === 'Note'" v-model="resourceForm.note" class="form-control mb-2" placeholder="Write your note here..."></textarea>
+    <input v-if="resourceForm.type === 'File'" type="file" @change="e => resourceForm.file = e.target.files[0]" class="form-control mb-2" />
+
+    <button @click="uploadResource" class="btn btn-primary">Upload</button>
+  </div>
+
+  <!-- 📤 Send Content to a Student Section -->
+  <div class="section-card mt-4">
+    <h5>📤 Send Content to a Student</h5>
+    <select v-model="selectedStudent" class="form-control mb-2">
+      <option disabled value="">Select a Student</option>
+      <option v-for="s in students" :value="s.username">{{ s.fullName }} ({{ s.username }})</option>
+    </select>
+
+    <select v-model="sendForm.type" class="form-control mb-2">
+      <option>Link</option>
+      <option>File</option>
+      <option>Note</option>
+    </select>
+
+    <input v-if="sendForm.type === 'Link'" v-model="sendForm.url" class="form-control mb-2" placeholder="Paste link here..." />
+    <textarea v-if="sendForm.type === 'Note'" v-model="sendForm.note" class="form-control mb-2" placeholder="Write your note here..."></textarea>
+    <input v-if="sendForm.type === 'File'" type="file" @change="e => sendForm.file = e.target.files[0]" class="form-control mb-2" />
+
+    <button @click="sendToStudent" class="btn btn-success">Send</button>
+  </div>
+</div>
+
+      
+
+
+
+
+
+
+
+
+      <!-- Profile -->
+      <div v-show="currentView === 'profile'">
+        <h2 class="dashboard-title">Counselor Profile</h2>
+        <div class="profile-container">
+          <div class="profile-header text-center">
+            <img src="./assets/mitzi.jpg" alt="Ms. Mitzi" class="profile-pic"/>
+            <h3>{{ loggedInUser.fullName }}</h3>
+            <h5>@{{ loggedInUser.username }}</h5>
+          </div>
+          <div class="profile-details mt-4">
+            <div class="row">
+              <div class="col-md-6"><label>Email</label><input type="email" class="form-control" :value="loggedInUser.email" disabled></div>
+              <div class="col-md-6"><label>Date of Birth</label><input type="text" class="form-control" :value="loggedInUser.dob" disabled></div>
+            </div>
+            <div class="row mt-3">
+              <div class="col-md-6"><label>Age</label><input type="text" class="form-control" :value="calculateAge(loggedInUser.dob)" disabled></div>
+              <div class="col-md-6"><label>Type of Account</label><input type="text" class="form-control" :value="loggedInUser.role" disabled></div>
+            </div>
+            <div class="row mt-3">
+              <div class="col-md-6"><label>Gender</label><select class="form-control"><option>Male</option><option>Female</option><option>Other</option></select></div>
+              <div class="col-md-6"><label>Phone Number</label><input type="text" class="form-control" placeholder="Enter your phone number"></div>
+            </div>
+            <div class="row mt-4 text-center">
+                <div class="col-md-12">
+                  <button class="btn btn-primary">Save Changes</button>
+                  <button class="btn btn-danger" onclick="changePassword()">Change Password</button>
+                </div>
+              </div> <!-- ✅ close button row -->
+              </div>   <!-- ✅ close .profile-details -->
+              </div>   <!-- ✅ close .profile-container -->
+              </div>   <!-- ✅ close .profile view -->
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  function logout() {
+    window.location.href = 'public/index.html';
+  }
+
+  function viewProfile() {
+    app.currentView = 'profile';
+  }
+
+  new Vue({
+    el: "#app",
+    data: {
+      currentView: 'dashboard',
+      FileUploadSection: false,
+      selectedFile: null,
+      showUploadActions: false,
+      dataUploaded: false,
+      uploadedRows: [],
+      appointments: [],
+      appointmentForm: {
+        date: '', time: '', studentName: '', misis: '', contactInfo: '', purpose: ''
+      },
+      loggedInUser: {
+        username: "", password: "", dob: "", role: "", email: "", fullName: ""
+      },
+
+      showManualSessionNotes: false,
+
+
+
+
+      sessionNotes: [{
+        Date: '',
+        "Student Name": '',
+        Session: '',
+        Week: '',
+        Gender: '',
+        MISIS: '',
+        Year: '',
+        Nationality: '',
+        "Counselling Methods Used": '',
+        "Area of Concern": '',
+        "Summary of Discussion": '',
+        Notes: ''
+        }],
+
+
+        editableSessionNotes: [],
+        showEditableTable: false,
+
+
+
+        insightsData: {
+          appointments: [],
+          sessionNotes: []
+        },
+        builder: {
+          type: 'bar',
+          x: '',
+          y: '',
+          agg: 'count'
+        },
+        fieldOptions: [],
+        customChartData: null,
+
+        dashboardCounts: {
+          appointments: 0,
+          sessionNotes: 0
+        },
+
+        customChartVisible: false,
+
+
+        students: [],
+        resources: [],
+        selectedStudent: "",
+        messageToSend: "",
+        uploadedFile: null,
+        resourceForm: {
+          title: "",
+          description: "",
+          type: "Link",
+          url: ""
+        },
+
+        resourceForm: {
+          title: "",
+          description: "",
+          type: "Link",
+          url: "",
+          note: "",
+          file: null
+        },
+        sendForm: {
+          type: "Link",
+          url: "",
+          note: "",
+          file: null
+        },
+
+
+
+        
+
+
+
+
+
+
+
+
+
+    },
+    mounted() {
+      this.whoLoggedIn();
+      this.fetchAppointments();
+      this.fetchUploadedData();
+      this.fetchManualSessionNotes(); // 👈 Add this
+      this.fetchInsightsData();
+      this.fetchDashboardCounts(); // ✅ added here
+
+
+
+      fetch("http://localhost:3000/students")
+        .then(res => res.json())
+        .then(data => { this.students = data; });
+
+      fetch("http://localhost:3000/resources")
+        .then(res => res.json())
+        .then(data => { this.resources = data; });
+      
+
+    },
+
+    // watch: {
+    //   currentView(newVal) {
+    //     this.$nextTick(() => {
+    //       if (newVal === 'dashboard') {
+    //         this.drawConcernsChart();
+    //         this.drawGenderChart();
+    //       } else if (newVal === 'insights') {
+    //         this.drawAppointmentsChart();
+    //         this.drawConcernsChartInsights(); // 👈 use new method
+    //         this.drawGenderChartInsights();   // 👈 use new method
+    //         this.drawYearLevelChart();
+    //       }
+    //     });
+    //   }
+    // },
+
+
+
+    methods: {
+      whoLoggedIn() {
+        const user = JSON.parse(localStorage.getItem('loggedInUser'));
+        this.loggedInUser = { ...this.loggedInUser, ...user };
+      },
+      showFileUploadSection() {
+            this.FileUploadSection = true;
+            this.showManualSessionNotes = false;  // ✅ disable manual entry
+            this.sessionNotes = [];               // optional: reset manual notes
+        },
+      onFileSelected(event) {
+        this.selectedFile = event.target.files[0];
+      },
+      uploadSessionData() {
+        if (!this.selectedFile) return alert("No file selected.");
+        const formData = new FormData();
+        formData.append("file", this.selectedFile);
+
+        fetch('http://localhost:3000/upload-session-notes', { method: "POST", body: formData })
+          .then(res => res.json())
+          .then(data => {
+            alert(data.message || "Upload complete.");
+            this.FileUploadSection = false;
+            this.selectedFile = null;
+            this.showUploadActions = true;
+            this.fetchUploadedData(true); // show push/delete warning after upload
+            this.dataUploaded = true;
+          })
+          .catch(err => {
+            alert("Upload failed.");
+            console.error(err);
+          });
+      },
+      fetchUploadedData(showWarning = false) {
+          fetch("http://localhost:3000/uploaded-data")
+            .then(res => res.json())
+            .then(data => {
+              this.uploadedRows = data;
+
+              if (data.length > 0) {
+                this.dataUploaded = true;
+
+                // If this fetch was triggered after a file upload, show the push/delete warning
+                if (showWarning) {
+                  this.showUploadActions = true;
+                  this.FileUploadSection = false;
+                  this.showManualSessionNotes = false;
+                  this.showEditableTable = false;
+                } else {
+                  // Otherwise, show the table directly (e.g. on refresh)
+                  this.editableSessionNotes = JSON.parse(JSON.stringify(data));
+                  this.showEditableTable = true;
+                  this.FileUploadSection = false;
+                  this.showManualSessionNotes = false;
+                  this.showUploadActions = false;
+                }
+              } else {
+                // No data = show Import/Manual buttons
+                this.dataUploaded = false;
+                this.showEditableTable = false;
+                this.FileUploadSection = false;
+                this.showManualSessionNotes = false;
+                this.showUploadActions = false;
+              }
+            })
+            .catch(err => {
+              console.error("Error fetching uploaded data:", err);
+            });
+        },
+
+
+      deleteUploadedData() {
+        fetch("http://localhost:3000/uploaded-data", { method: "DELETE" })
+          .then(res => res.json())
+          .then(() => {
+            alert("Uploaded data deleted.");
+            this.uploadedRows = [];
+            this.FileUploadSection = false;
+            this.selectedFile = null;
+            this.showUploadActions = false;
+            this.dataUploaded = false;
+          });
+      },
+      pushDataToTable() {
+        this.editableSessionNotes = JSON.parse(JSON.stringify(this.uploadedRows)); // clone for editing
+        this.showEditableTable = true;
+        this.FileUploadSection = false;
+        this.selectedFile = null;
+        this.showUploadActions = false;
+        },
+
+      fetchAppointments() {
+        fetch("http://localhost:3000/get-appointments")
+          .then(res => res.json())
+          .then(data => { this.appointments = data; });
+      },
+      addAppointment() {
+        fetch('http://localhost:3000/add-appointment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(this.appointmentForm)
+        })
+        .then(res => res.json())
+        .then(data => {
+          alert(data.message);
+          this.fetchAppointments();
+          this.appointmentForm = { date: '', time: '', studentName: '', misis: '', contactInfo: '', purpose: '' };
+        })
+        .catch(err => console.error("Error:", err));
+      },
+
+    
+        enableManualEntry() {
+            this.showManualSessionNotes = true;
+            this.FileUploadSection = false;       // ✅ disable file upload
+            this.selectedFile = null;             // optional: reset file
+            this.sessionNotes = [{
+                Date: '',
+                "Student Name": '',
+                Session: '',
+                Week: '',
+                Gender: '',
+                MISIS: '',
+                Year: '',
+                Nationality: '',
+                "Counselling Methods Used": '',
+                "Area of Concern": '',
+                "Summary of Discussion": '',
+                Notes: ''
+            }];
+            },
+            addEmptySessionNote() {
+            this.sessionNotes.push({
+                Date: '',
+                "Student Name": '',
+                Session: '',
+                Week: '',
+                Gender: '',
+                MISIS: '',
+                Year: '',
+                Nationality: '',
+                "Counselling Methods Used": '',
+                "Area of Concern": '',
+                "Summary of Discussion": '',
+                Notes: ''
+            });
+            },
+            removeSessionNote(index) {
+            this.sessionNotes.splice(index, 1);
+            if (this.sessionNotes.length === 0) {
+                this.showManualSessionNotes = false;
+            }
+            },
+            saveManualSessionNotes() {
+              fetch('http://localhost:3000/manual-session-notes', { method: 'DELETE' }) // delete old notes first
+                .then(() => {
+                  return fetch('http://localhost:3000/save-session-notes', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(this.sessionNotes)
+                  });
+                })
+                .then(res => res.json())
+                .then(data => {
+                  alert(data.message || 'Session notes saved!');
+                })
+                .catch(err => {
+                  console.error("Failed to save session notes:", err);
+                });
+            },
+
+
+
+            saveEditedNotes() {
+                const existingUpdates = [];
+                const newInserts = [];
+
+                this.editableSessionNotes.forEach(row => {
+                  if (row._id) {
+                    const updated = { ...row };
+                    const id = updated._id;
+                    delete updated._id;
+                    existingUpdates.push({ id, updated });
+                  } else {
+                    newInserts.push(row);
+                  }
+                });
+
+                const updatePromise = existingUpdates.length
+                  ? fetch('http://localhost:3000/update-uploaded-data', {
+                      method: 'PUT',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify(existingUpdates)
+                    }).then(res => res.json())
+                  : Promise.resolve();
+
+                const insertPromise = newInserts.length
+                  ? fetch('http://localhost:3000/insert-uploaded-session-notes', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify(newInserts)
+                    }).then(res => res.json())
+                  : Promise.resolve();
+
+                Promise.all([updatePromise, insertPromise])
+                  .then(() => {
+                    alert("All session notes saved successfully!");
+                    this.fetchUploadedData(); // Refresh table
+                  })
+                  .catch(err => {
+                    console.error("Save error:", err);
+                    alert("Failed to save session notes.");
+                  });
+              },
+
+
+
+                exportToCSV() {
+                    const rows = this.editableSessionNotes;
+                    if (rows.length === 0) return;
+
+                    const headers = Object.keys(rows[0]);
+                    const csv = [
+                        headers.join(','),
+                        ...rows.map(row =>
+                        headers.map(h => `"${(row[h] || '').toString().replace(/"/g, '""')}"`).join(',')
+                        )
+                    ].join('\n');
+
+                    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = 'session_notes.csv';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    },
+
+                    clearEditableTable() {
+                      if (!confirm("Are you sure you want to delete the entire table?")) return;
+
+                      fetch("http://localhost:3000/uploaded-data", {
+                        method: "DELETE"
+                      })
+                      .then(res => res.json())
+                      .then(() => {
+                        alert("All uploaded session notes deleted.");
+                        this.editableSessionNotes = [];
+                        this.showEditableTable = false;
+                        this.dataUploaded = false; // ✅ FIX: show Import Data button again
+                      })
+                      .catch(err => console.error("Delete failed:", err));
+                    },
+
+
+                removeUploadedRow(index) {
+                    this.uploadedRows.splice(index, 1);
+                    if (this.uploadedRows.length === 0) {
+                        this.uploadedRows = [];
+                        this.dataUploaded = false;
+                    }
+                    },
+
+
+                    saveUploadedEdits() {
+                        fetch("http://localhost:3000/update-uploaded-data", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify(this.uploadedRows)
+                        })
+                        .then(res => res.json())
+                        .then(data => alert(data.message || "Session notes updated successfully!"))
+                        .catch(err => {
+                            alert("Failed to update uploaded data.");
+                            console.error(err);
+                        });
+                        },
+
+
+                        addEditableNote() {
+                          this.editableSessionNotes.push({
+                            Date: '',
+                            "Student Name": '',
+                            Session: '',
+                            Week: '',
+                            Gender: '',
+                            MISIS: '',
+                            Year: '',
+                            Nationality: '',
+                            "Counselling Methods Used": '',
+                            "Area of Concern": '',
+                            "Summary of Discussion": '',
+                            Notes: ''
+                          });
+                        },
+
+                        removeEditableNote(index) {
+                          this.editableSessionNotes.splice(index, 1);
+                        },
+
+                        exportManualToCSV() {
+                            const rows = this.sessionNotes;
+                            if (rows.length === 0) return;
+
+                            const headers = Object.keys(rows[0]);
+                            const csv = [
+                              headers.join(','),
+                              ...rows.map(row =>
+                                headers.map(h => `"${(row[h] || '').toString().replace(/"/g, '""')}"`).join(',')
+                              )
+                            ].join('\n');
+
+                            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                            const url = URL.createObjectURL(blob);
+                            const link = document.createElement('a');
+                            link.href = url;
+                            link.download = 'manual_session_notes.csv';
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                          },
+
+
+                          fetchManualSessionNotes() {
+                            fetch("http://localhost:3000/manual-session-notes")
+                              .then(res => res.json())
+                              .then(data => {
+                                if (data.length > 0) {
+                                  this.sessionNotes = data;
+                                  this.showManualSessionNotes = true;
+                                }
+                              })
+                              .catch(err => {
+                                console.error("Failed to fetch manual session notes:", err);
+                              });
+                          },
+
+
+                          //chat generation method
+                          fetchInsightsData() {
+                            fetch("http://localhost:3000/get-appointments")
+                              .then(res => res.json())
+                              .then(data => {
+                                this.insightsData.appointments = data;
+                                this.drawAppointmentsChart();
+                              });
+
+                                fetch("http://localhost:3000/uploaded-data")
+                                  .then(res => res.json())
+                                  .then(data => {
+                                    this.insightsData.sessionNotes = data;
+                                    this.fieldOptions = Object.keys(data[0] || {}).filter(
+                                      key => key !== '_id' && key !== 'Summary of Discussion' && key !== 'Notes'
+                                    );
+                                    this.drawConcernsChart();
+                                    this.drawGenderChart();
+                                    this.drawYearLevelChart(); // 🆕 New chart
+                                    this.drawConcernsChartInsights();
+                                    this.drawGenderChartInsights();
+                                  });
+                            },
+                            drawAppointmentsChart() {
+                              const ctx = document.getElementById("appointmentsChart").getContext("2d");
+                              const purposeCount = {};
+
+                              this.insightsData.appointments.forEach(appt => {
+                                const purpose = appt.purpose || "Other";
+                                purposeCount[purpose] = (purposeCount[purpose] || 0) + 1;
+                              });
+
+                              new Chart(ctx, {
+                                type: 'bar',
+                                data: {
+                                  labels: Object.keys(purposeCount),
+                                  datasets: [{
+                                    label: 'Appointments by Purpose',
+                                    data: Object.values(purposeCount),
+                                    backgroundColor: '#007bff'
+                                  }]
+                                },
+                                options: {
+                                  animation: {
+                                    duration: 1000,
+                                    easing: 'easeOutQuart'
+                                  },
+                                  responsive: true,
+                                  maintainAspectRatio: false,
+                                  scales: {
+                                    yAxes: [{ ticks: { beginAtZero: true } }]
+                                  }
+                                }
+                              });
+                            },
+
+                            drawConcernsChart() {
+                              const ctx = document.getElementById("concernsChart").getContext("2d");
+                              const concernCount = {};
+
+                              this.insightsData.sessionNotes.forEach(note => {
+                                const concern = note['Area of Concern'];
+                                concernCount[concern] = (concernCount[concern] || 0) + 1;
+                              });
+
+                              new Chart(ctx, {
+                                type: 'bar',
+                                data: {
+                                  labels: Object.keys(concernCount),
+                                  datasets: [{
+                                    label: 'Concerns',
+                                    data: Object.values(concernCount),
+                                    backgroundColor: '#dc3545'
+                                  }]
+                                }
+                              });
+                            },
+                            drawGenderChart() {
+                              const ctx = document.getElementById("genderChart").getContext("2d");
+                              const genderCount = {};
+
+                              this.insightsData.sessionNotes.forEach(note => {
+                                const gender = note.Gender;
+                                genderCount[gender] = (genderCount[gender] || 0) + 1;
+                              });
+
+                              new Chart(ctx, {
+                                type: 'pie',
+                                data: {
+                                  labels: Object.keys(genderCount),
+                                  datasets: [{
+                                    label: 'Gender',
+                                    data: Object.values(genderCount),
+                                    backgroundColor: ['#007bff', '#ffc107', '#28a745']
+                                  }]
+                                }
+                              });
+                            },
+
+                            drawYearLevelChart() {
+                              const ctx = document.getElementById("yearChart").getContext("2d");
+                              const yearLevelCount = {};
+
+                              this.insightsData.sessionNotes.forEach(note => {
+                                const year = note.Year || "Unknown";
+                                yearLevelCount[year] = (yearLevelCount[year] || 0) + 1;
+                              });
+
+                              new Chart(ctx, {
+                                type: 'bar',
+                                data: {
+                                  labels: Object.keys(yearLevelCount),
+                                  datasets: [{
+                                    label: 'Sessions by Year Level',
+                                    data: Object.values(yearLevelCount),
+                                    backgroundColor: '#6f42c1'
+                                  }]
+                                }
+                              });
+                            },
+
+                            generateCustomChart() {
+                              const { x, y, type, agg } = this.builder;
+
+                              if (!x) return alert("Please select X-axis.");
+                              if (type !== 'pie' && (!y || !agg)) return alert("Please select both Y-axis and Aggregation for Bar/Line charts.");
+
+
+                              this.customChartVisible = true;
+
+                              this.$nextTick(() => {
+                                const canvas = document.getElementById("customChart");
+                                if (!canvas) return alert("Chart canvas not found.");
+                                const ctx = canvas.getContext("2d");
+
+                                // Reset old chart
+                                if (this.customChartData) this.customChartData.destroy();
+
+                                const dataMap = {};
+
+                                this.insightsData.sessionNotes.forEach(item => {
+                                  const xVal = item[x];
+
+                                  if (type === 'pie') {
+                                    dataMap[xVal] = (dataMap[xVal] || 0) + 1;
+                                  } else {
+                                    const yVal = parseFloat(item[y]);
+                                    if (!isNaN(yVal)) {
+                                      if (agg === 'count') {
+                                        dataMap[xVal] = (dataMap[xVal] || 0) + 1;
+                                      } else if (agg === 'sum') {
+                                        dataMap[xVal] = (dataMap[xVal] || 0) + yVal;
+                                      }
+                                      if (agg === 'avg') {
+                                      if (!dataMap[xVal]) dataMap[xVal] = { total: 0, count: 0 };
+                                      dataMap[xVal].total += yVal;
+                                      dataMap[xVal].count += 1;
+                                    }
+                                    }
+                                  }
+                                });
+
+                                const chartConfig = {
+                                  type,
+                                  data: {
+                                    labels: Object.keys(dataMap),
+                                    datasets: [{
+                                      label: `${type === 'pie' ? x : `${agg} of ${y}`} by ${x}`,
+                                      data: Object.values(dataMap),
+                                      backgroundColor: type === 'pie'
+                                        ? ['#007bff', '#dc3545', '#ffc107', '#28a745', '#6f42c1']
+                                        : '#17a2b8'
+                                    }]
+                                  },
+                                  options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    animation: {
+                                      duration: 1000,
+                                      easing: 'easeOutQuart'
+                                    },
+                                    scales: type !== 'pie' ? {
+                                      yAxes: [{ ticks: { beginAtZero: true } }]
+                                    } : {}
+                                  }
+                                };
+
+                                this.customChartData = new Chart(ctx, chartConfig);
+                              });
+                            },
+
+
+
+
+
+                            fetchDashboardCounts() {
+                              fetch("http://localhost:3000/get-appointments")
+                                .then(res => res.json())
+                                .then(data => {
+                                  this.dashboardCounts.appointments = data.length;
+                                });
+
+                              fetch("http://localhost:3000/uploaded-data")
+                                .then(res => res.json())
+                                .then(data => {
+                                  this.dashboardCounts.sessionNotes = data.length;
+                                });
+                            },
+
+
+                            drawConcernsChartInsights() {
+                              const ctx = document.getElementById("concernsChartInsights").getContext("2d");
+                              const concernCount = {};
+                              this.insightsData.sessionNotes.forEach(note => {
+                                const concern = note['Area of Concern'];
+                                concernCount[concern] = (concernCount[concern] || 0) + 1;
+                              });
+
+                              new Chart(ctx, {
+                                type: 'bar',
+                                data: {
+                                  labels: Object.keys(concernCount),
+                                  datasets: [{
+                                    label: 'Concerns',
+                                    data: Object.values(concernCount),
+                                    backgroundColor: '#dc3545'
+                                  }]
+                                }
+                              });
+                            },
+
+                            drawGenderChartInsights() {
+                              const ctx = document.getElementById("genderChartInsights").getContext("2d");
+                              const genderCount = {};
+
+                              this.insightsData.sessionNotes.forEach(note => {
+                                const gender = note.Gender;
+                                genderCount[gender] = (genderCount[gender] || 0) + 1;
+                              });
+
+                              new Chart(ctx, {
+                                type: 'pie',
+                                data: {
+                                  labels: Object.keys(genderCount),
+                                  datasets: [{
+                                    label: 'Gender',
+                                    data: Object.values(genderCount),
+                                    backgroundColor: ['#007bff', '#ffc107', '#28a745']
+                                  }]
+                                }
+                              });
+                            },
+
+
+
+                            handleViewChange(newView) {
+                              this.currentView = newView;
+
+                              this.$nextTick(() => {
+                                if (newView === 'dashboard') {
+                                  this.drawConcernsChart();
+                                  this.drawGenderChart();
+                                } else if (newView === 'insights') {
+                                  this.drawAppointmentsChart();
+                                  this.drawConcernsChartInsights();
+                                  this.drawGenderChartInsights();
+                                  this.drawYearLevelChart();
+                                }
+                              });
+                            },
+
+
+
+
+                            //ver 10
+                            uploadResource() {
+                              const formData = new FormData();
+                              formData.append("title", this.resourceForm.title);
+                              formData.append("description", this.resourceForm.description);
+                              formData.append("type", this.resourceForm.type);
+
+                              if (this.resourceForm.type === "Link") {
+                                formData.append("url", this.resourceForm.url);
+                              } else if (this.resourceForm.type === "Note") {
+                                formData.append("note", this.resourceForm.note);
+                              } else if (this.resourceForm.type === "File" && this.resourceForm.file) {
+                                formData.append("file", this.resourceForm.file);
+                              }
+
+                              fetch("http://localhost:3000/upload-resource", {
+                                method: "POST",
+                                body: formData
+                              })
+                              .then(res => res.json())
+                              .then(data => {
+                                alert(data.message);
+                                this.resourceForm = {
+                                  title: "", description: "", type: "Link", url: "", note: "", file: null
+                                };
+                                this.fetchResources();
+                              });
+                            },
+                            sendToStudent() {
+                              if (!this.selectedStudent) return alert("Select a student first.");
+
+                              const formData = new FormData();
+                              formData.append("to", this.selectedStudent);
+                              formData.append("type", this.sendForm.type);
+
+                              if (this.sendForm.type === "Link") {
+                                if (!this.sendForm.url) return alert("Please enter a link.");
+                                formData.append("url", this.sendForm.url);
+                              } else if (this.sendForm.type === "Note") {
+                                if (!this.sendForm.note) return alert("Please enter a note.");
+                                formData.append("note", this.sendForm.note);
+                              } else if (this.sendForm.type === "File") {
+                                if (!this.sendForm.file) return alert("Please select a file.");
+                                formData.append("file", this.sendForm.file);
+                              }
+
+                              fetch("http://localhost:3000/send-to-student", {
+                                method: "POST",
+                                body: formData
+                              })
+                              .then(res => res.json())
+                              .then(data => {
+                                alert(data.message);
+                                this.selectedStudent = "";
+                                this.sendForm = { type: "Link", url: "", note: "", file: null };
+                              });
+                            },
+
+
+
+
+                            calculateAge(dob) {
+                              if (!dob) return "";
+                              const birthDate = new Date(dob);
+                              const diff = Date.now() - birthDate.getTime();
+                              const ageDt = new Date(diff);
+                              return Math.abs(ageDt.getUTCFullYear() - 1970);
+                            }
+
+
+
+
+
+
+                        
+
+
+
+
+
+
+                        
+
+
+    
+    }
+  });
+</script>
+</body>
+</html>

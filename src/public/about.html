@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About MindAid</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f9ff;
+            color: #333;
+        }
+
+        header {
+            background-color: #ffffff;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        header h1 {
+            font-size: 2em;
+            margin: 0;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 15px;
+        }
+
+        nav ul li {
+            display: inline;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        nav ul li a.active {
+            background-color: #007bff;
+            color: #ffffff;
+        }
+
+        nav ul li a:hover {
+            background-color: #007bff;
+            color: #ffffff;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 80px 20px;
+            background: linear-gradient(to bottom, rgba(0, 123, 255, 0.7), rgba(255, 255, 255, 0.7)), url('https://source.unsplash.com/1920x1080/?mental-health') no-repeat center center;
+            background-size: cover;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 60vh;
+            animation: fadeIn 2s;
+        }
+
+        .hero h2 {
+            font-size: 3.5em;
+            margin-bottom: 15px;
+            color: #ffffff;
+            animation: zoomIn 2s;
+        }
+
+        .hero p {
+            font-size: 1.5em;
+            color: #ffffff;
+            max-width: 700px;
+            margin: 0 auto;
+            animation: fadeInUp 2s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes zoomIn {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .section-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            padding: 50px;
+        }
+
+        .section {
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            text-align: center;
+            animation: fadeIn 1.5s;
+            position: relative;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .section img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin: 20px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .section h3 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            color: #007bff;
+        }
+
+        .section p {
+            font-size: 1.1em;
+            line-height: 1.8;
+            color: #555;
+        }
+
+        .section .icon {
+            font-size: 6em;
+            color: #007bff;
+            margin-bottom: 15px;
+            animation: spin 4s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .team {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            padding: 50px;
+        }
+
+        .team .member {
+            background: linear-gradient(to right, #eef6ff, #dceeff);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            animation: fadeInUp 2s;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .team .member:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .team .member img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin-bottom: 15px;
+            border: 3px solid #007bff;
+        }
+
+        .team .member h4 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: #007bff;
+        }
+
+        .team .member p {
+            font-size: 1.1em;
+            color: #555;
+        }
+
+        .team .linkedin {
+            font-size: 1.5em;
+            color: #007bff;
+            margin-top: 10px;
+            transition: color 0.3s;
+        }
+
+        .team .linkedin:hover {
+            color: #0056b3;
+        }
+
+        footer {
+            background-color: #007bff;
+            color: #ffffff;
+            text-align: center;
+            padding: 20px;
+        }
+
+        footer p {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1><i class="fas fa-heartbeat"></i> MindAid</h1>
+        <nav>
+            <ul>
+                <li><a href="public/index.html">Home</a></li>
+                <li><a href="public/about.html">About</a></li>
+                <li><a href="public/login.html" class="active">Sign In</a></li>
+
+
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h2>About MindAid</h2>
+        <p>MindAid is an innovative platform designed to bridge the gap in mental health support for students and counselors, providing a seamless, technology-driven solution.</p>
+    </section>
+
+    <div class="section-container">
+        <div class="section">
+            <h3>Why MindAid?</h3>
+            <div class="icon"><i class="fas fa-lightbulb"></i></div>
+            <p>With the increasing demand for mental health services, there is a critical need for platforms that cater to both students and mental health professionals. MindAid is designed to streamline appointment scheduling, session tracking, and resource sharing, addressing the unique challenges faced by counselors and students alike.</p>
+            <p>Our goal is to make mental health management accessible and efficient, empowering counselors to provide better care and helping students navigate their mental health journey with confidence.</p>
+        </div>
+        <div class="section">
+            <h3>Meet the Creator</h3>
+            <img src="./assets/AmayPic2.jpg" alt="Amay Bahar Waykool">
+            <p>Hi, I’m <strong>Amay Bahar Waykool</strong>, a final-year IT student at Middlesex University Dubai. I created MindAid to address the gaps in mental health service management. My experience at the Center for Academic Success inspired me to develop a platform tailored to the needs of both counselors and students.</p>
+            <a href="https://www.linkedin.com/in/amay-waykool/" class="linkedin" style="font-size: 1.5em; color: #007bff; margin-top: 10px; transition: color 0.3s;">
+                <i class="fab fa-linkedin"></i>
+            </a>
+        </div>
+    </div>
+
+    <section class="team">
+        <div class="member">
+            <img src="./assets/rubina.jpg" alt="Ms. Rubina">
+            <h4>Ms. Rubina</h4>
+            <p>Expert Mental Health Counselor, providing invaluable expertise and guidance for the platform's development.</p>
+            <a href="https://www.linkedin.com/in/rubina-zahoor-b5b37935/" class="linkedin"><i class="fab fa-linkedin"></i></a>
+        </div>
+        <div class="member">
+            <img src="./assets/mitzi.jpg" alt="Ms. Mitzi">
+            <h4>Ms. Mitzi</h4>
+            <p>Key advisor and expert counselor, ensuring that MindAid addresses the real-world challenges of mental health support.</p>
+            <a href="https://www.linkedin.com/in/mitzi-ann-amaral-25b17b9b/" class="linkedin"><i class="fab fa-linkedin"></i></a>
+        </div>
+        <div class="member">
+            <img src="./assets/chinnu.webp" alt="Ms. Chinnu">
+            <h4>Ms. Chinnu</h4>
+            <p>Project Supervisor, offering critical guidance and mentorship throughout the development of MindAid.</p>
+            <a href="https://www.linkedin.com/in/dr-chinnu-mary-george-3824685b" class="linkedin"><i class="fab fa-linkedin"></i></a>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 MindAid by Amay W. All Rights Reserved.</p>
+    </footer>
+</body>
+</html>

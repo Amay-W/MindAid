@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Student Dashboard - MindAid</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.7.16/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"/>
+  <link rel="stylesheet" href="css/student.css"/>
+</head>
+<body>
+<div id="app">
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <i class="fas fa-heartbeat"></i>
+      <h1>MindAid</h1>
+    </div>
+    <div class="top-nav">
+      <img src="./assets/AmayPic2.jpg" alt="Student Profile" />
+      <span class="username">{{ student.fullName }}</span>
+      <button class="logout-btn" @click="logout"><i class="fas fa-sign-out-alt"></i></button>
+    </div>
+  </header>
+
+  <!-- Layout -->
+  <div class="main-container">
+    <!-- Sidebar Navigation -->
+    <nav class="side-nav">
+      <a href="#" :class="{ active: currentView === 'appointments' }" @click.prevent="currentView = 'appointments'">Appointments</a>
+      <a href="#" :class="{ active: currentView === 'resources' }" @click.prevent="currentView = 'resources'">Shared Resources</a>
+      <a href="#" :class="{ active: currentView === 'messages' }" @click.prevent="currentView = 'messages'">Messages</a>
+    </nav>
+
+    <!-- Content Area -->
+    <div class="content">
+
+      <!-- Appointments -->
+      <div v-show="currentView === 'appointments'">
+        <h2 class="dashboard-title">Appointments with Ms. Mitzi</h2>
+
+        <h5 class="mt-4">📅 Upcoming Appointments</h5>
+        <table class="table table-bordered table-sm bg-white">
+          <thead class="table-light">
+            <tr><th>Date</th><th>Time</th><th>Purpose</th><th>Location</th></tr>
+          </thead>
+          <tbody>
+            <tr v-for="appt in upcomingAppointments" :key="'upcoming-' + appt.date + appt.time">
+              <td>{{ appt.date }}</td>
+              <td>{{ appt.time }}</td>
+              <td>{{ appt.purpose }}</td>
+              <td>{{ appt.location }}</td>
+            </tr>
+            <tr v-if="upcomingAppointments.length === 0">
+              <td colspan="4" class="text-center">No upcoming appointments.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h5 class="mt-5">🕓 Recent Appointments</h5>
+        <table class="table table-bordered table-sm bg-white">
+          <thead class="table-light">
+            <tr><th>Date</th><th>Time</th><th>Purpose</th><th>Location</th></tr>
+          </thead>
+          <tbody>
+            <tr v-for="appt in pastAppointments" :key="'past-' + appt.date + appt.time">
+              <td>{{ appt.date }}</td>
+              <td>{{ appt.time }}</td>
+              <td>{{ appt.purpose }}</td>
+              <td>{{ appt.location }}</td>
+            </tr>
+            <tr v-if="pastAppointments.length === 0">
+              <td colspan="4" class="text-center">No past appointments.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Resources -->
+      <div v-show="currentView === 'resources'">
+        <h2 class="dashboard-title">Shared Resources</h2>
+        <div class="section-card">
+          <ul>
+            <li v-for="resource in sharedResources" :key="resource.title">
+              <strong>{{ resource.title }}</strong> - {{ resource.description }}
+              <span v-if="resource.type === 'link'">(<a :href="resource.url" target="_blank">Open</a>)</span>
+              <span v-if="resource.type === 'file'">(<a :href="resource.url" target="_blank">Download</a>)</span>
+              <span v-if="resource.type === 'note'"><br><em>{{ resource.content }}</em></span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div v-show="currentView === 'messages'">
+        <h2 class="dashboard-title">Message Ms. Mitzi</h2>
+        <div class="section-card">
+          <textarea class="form-control mb-2" v-model="message" placeholder="Type your message..."></textarea>
+          <input type="file" class="form-control mb-2" @change="onFileSelected">
+          <button class="btn btn-primary" @click="sendMessage">Send</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+new Vue({
+  el: '#app',
+  data: {
+    currentView: 'appointments',
+    message: '',
+    selectedFile: null,
+    student: {
+      fullName: '',
+      username: '',
+      email: '',
+      role: '',
+    },
+    appointments: [
+      { date: '2025-04-15', time: '10:00 AM', purpose: 'Stress Management', location: 'Room A1' },
+      { date: '2025-04-05', time: '2:00 PM', purpose: 'Exam Anxiety', location: 'Room A1' },
+      { date: '2025-04-30', time: '12:00 PM', purpose: 'Career Planning', location: 'Room A1' },
+      { date: '2025-03-20', time: '1:00 PM', purpose: 'Academic Support', location: 'Room A1' }
+    ],
+    sharedResources: [
+      {
+        title: 'Journaling Template',
+        description: 'Use this template for daily self-reflection.',
+        type: 'file',
+        url: '#'
+      },
+      {
+        title: 'Mindfulness Playlist',
+        description: 'Relaxing sounds for anxiety relief.',
+        type: 'link',
+        url: 'https://open.spotify.com/playlist/xyz123'
+      },
+      {
+        title: 'Positive Affirmations',
+        description: 'Helpful quotes for tough days.',
+        type: 'note',
+        content: 'You are capable of amazing things. Keep going!'
+      }
+    ]
+  },
+  computed: {
+    upcomingAppointments() {
+      const today = new Date().toISOString().split("T")[0];
+      return this.appointments.filter(appt => appt.date >= today);
+    },
+    pastAppointments() {
+      const today = new Date().toISOString().split("T")[0];
+      return this.appointments.filter(appt => appt.date < today);
+    }
+  },
+  mounted() {
+    const storedUser = JSON.parse(localStorage.getItem("loggedInUser"));
+    if (storedUser && storedUser.role === "Student") {
+      this.student = storedUser;
+    } else {
+      window.location.href = "public/login.html";
+    }
+  },
+  methods: {
+    onFileSelected(e) {
+      this.selectedFile = e.target.files[0];
+    },
+    sendMessage() {
+      if (!this.message && !this.selectedFile) {
+        alert("Please write a message or attach a file.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("from", this.student.username);
+      formData.append("message", this.message);
+      if (this.selectedFile) formData.append("file", this.selectedFile);
+
+      fetch("http://localhost:3000/message-counselor", {
+        method: "POST",
+        body: formData
+      })
+      .then(res => res.json())
+      .then(data => {
+        alert("Message sent!");
+        this.message = '';
+        this.selectedFile = null;
+      })
+      .catch(err => {
+        alert("Failed to send.");
+        console.error(err);
+      });
+    },
+    logout() {
+      localStorage.removeItem("loggedInUser");
+      window.location.href = "public/login.html";
+    }
+  }
+});
+</script>
+</body>
+</html>

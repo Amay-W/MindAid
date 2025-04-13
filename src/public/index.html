@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindAid</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f9ff;
+            color: #333;
+        }
+
+        header {
+            background-color: #ffffff;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        header h1 {
+            font-size: 2em;
+            margin: 0;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 15px;
+        }
+
+        nav ul li {
+            display: inline;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        nav ul li a.active {
+            background-color: #007bff;
+            color: #ffffff;
+        }
+
+        nav ul li a:hover {
+            background-color: #007bff;
+            color: #ffffff;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 80px 20px;
+            background: linear-gradient(to bottom, #eef6ff, #f9fcff);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 60vh;
+            animation: fadeIn 2s;
+        }
+
+        .hero h2 {
+            font-size: 3em;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .hero p {
+            font-size: 1.2em;
+            color: #555;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .hero .icon {
+            font-size: 5em;
+            color: #007bff;
+            margin-top: 20px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-15px);
+            }
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 40px;
+        }
+
+        .content .box {
+            background: linear-gradient(to bottom, #ffffff, #eef6ff);
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s;
+            animation: fadeInUp 1.5s;
+        }
+
+        .content .box:hover {
+            transform: scale(1.05);
+        }
+
+        .content .box h3 {
+            font-size: 1.6em;
+            margin-bottom: 15px;
+            color: #007bff;
+        }
+
+        .content .box p {
+            font-size: 1em;
+            line-height: 1.8;
+            color: #555;
+        }
+
+        footer {
+            background-color: #007bff;
+            color: #ffffff;
+            text-align: center;
+            padding: 20px;
+            animation: fadeIn 2s;
+        }
+
+        footer p {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1><i class="fas fa-heartbeat"></i> MindAid</h1>
+        <nav>
+            <ul>
+               
+                <li><a href="public/index.html">Home</a></li>
+                <li><a href="public/about.html">About</a></li>
+                <li><a href="public/login.html" class="active">Sign In</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h2>Welcome to MindAid</h2>
+        <p>An application designed for university mental health counselors and students to streamline mental health support across UAE.</p>
+        <div class="icon"><i class="fas fa-heartbeat"></i></div>
+    </section>
+
+    <section class="content">
+        <div class="box">
+            <h3><i class="fas fa-user-plus"></i> Register Now</h3>
+            <p>Sign up today and access personalized support for a healthier, happier you.</p>
+        </div>
+        <div class="box">
+            <h3><i class="fas fa-calendar-alt"></i> Manage Appointments</h3>
+            <p>For counselors and students, schedule and track appointments effortlessly with our intuitive tools.</p>
+        </div>
+        <div class="box">
+            <h3><i class="fas fa-file-alt"></i> Session Records</h3>
+            <p>Maintain detailed records of counseling sessions for better tracking and insights.</p>
+        </div>
+        <div class="box">
+            <h3><i class="fas fa-share-alt"></i> Resource Sharing</h3>
+            <p>Easily share helpful resources with students or collaborate with fellow counselors.</p>
+        </div>
+        <div class="box">
+            <h3><i class="fas fa-chart-line"></i> Analytics & Insights</h3>
+            <p>Track trends and gain actionable insights with our analytics dashboard.</p>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 MindAid by Amay W. All Rights Reserved.</p>
+    </footer>
+</body>
+</html>

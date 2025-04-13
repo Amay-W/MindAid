@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.16/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f9ff;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        header {
+            background-color: #ffffff;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        header h1 {
+            font-size: 2em;
+            margin: 0;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 15px;
+        }
+
+        nav ul li {
+            display: inline;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        nav ul li a.active {
+            background-color: #007bff;
+            color: #ffffff;
+        }
+
+        nav ul li a:hover {
+            background-color: #007bff;
+            color: #ffffff;
+        }
+
+        .main-container {
+            position: relative;
+            flex: 1;
+            background: url('./assets/OG.png') no-repeat center center;
+            background-size: cover;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding-right: 3%;
+        }
+
+        .register-box {
+            width: 90%;
+            max-width: 350px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 30px 25px;
+            text-align: center;
+        }
+
+        .register-box h2 {
+            margin-bottom: 20px;
+            color: #007bff;
+            font-size: 1.8em;
+        }
+
+        .role-selection {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .role-toggle {
+            display: flex;
+            background: #e0e0e0;
+            border-radius: 25px;
+            padding: 5px;
+            width: 220px;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .role-toggle .toggle-option {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 0.9em;
+            color: #333;
+            border-radius: 25px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .role-toggle .toggle-option.active {
+            background: #007bff;
+            color: #fff;
+        }
+
+        .register-box label {
+            display: block;
+            text-align: left;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .register-box input {
+            width: calc(100% - 40px);
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+            display: inline-block;
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper input {
+            width: calc(100% - 40px);
+            display: inline-block;
+        }
+
+        .password-wrapper .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 40%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: black;
+        }
+
+        .register-box button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            color: #ffffff;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .register-box button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .register-box button:hover:enabled {
+            background-color: #0056b3;
+        }
+
+        footer {
+            background-color: #007bff;
+            color: #ffffff;
+            text-align: center;
+            padding: 10px;
+        }
+
+        footer p {
+            margin: 0;
+        }
+
+        .success {
+            color: green;
+            font-size: 0.8em;
+            margin-top: -10px;
+            margin-bottom: 15px;
+        }
+
+        .error {
+            color: red;
+            font-size: 0.8em;
+            margin-top: -10px;
+            margin-bottom: 15px;
+        }
+
+        .have-account {
+            font-size: 0.9em;
+            margin-top: 15px;
+        }
+
+        .have-account a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .have-account a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1><i class="fas fa-heartbeat"></i> MindAid</h1>
+        <nav>
+            <ul>
+                <li><a href="public/index.html">Home</a></li>
+                
+                <li><a href="public/about.html">About</a></li>
+        
+                <li><a href="public/login.html" class="active">Sign In</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div id="app" class="main-container">
+        <div class="register-box animate__animated animate__fadeIn">
+            <h2>Register</h2>
+            <div class="role-selection">
+                <div class="role-toggle">
+                    <div class="toggle-option" :class="{ active: role === 'Student' }" @click="setRole('Student')">Student</div>
+                    <div class="toggle-option" :class="{ active: role === 'Counselor' }" @click="setRole('Counselor')">Counselor</div>
+                </div>
+            </div>
+
+            <label for="fullName">Full Name</label>
+            <input type="text" id="fullName" v-model="fullName" @input="validateFullName" placeholder="Enter your full name">
+            <div class="error" v-if="errors.fullName">{{ errors.fullName }}</div>
+
+            <label for="username">Username</label>
+            <input type="text" id="username" v-model="username" @input="validateUsername" placeholder="Enter your username">
+            <div class="error" v-if="errors.username">{{ errors.username }}</div>
+
+            <label for="email">Email</label>
+            <input type="email" id="email" v-model="email" @input="validateEmail" placeholder="Enter your email">
+            <div class="error" v-if="errors.email">{{ errors.email }}</div>
+
+            <label for="dob">Date of Birth</label>
+            <input type="date" id="dob" v-model="dob" @input="validateDob">
+            <div class="error" v-if="errors.dob">{{ errors.dob }}</div>
+
+            <label for="password">Password</label>
+            <div class="password-wrapper">
+                <input type="password" id="password" v-model="password" @input="validatePassword" placeholder="Enter your password">
+                <i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'" class="toggle-password" @click="togglePassword"></i>
+            </div>
+            <div class="error" v-if="errors.password">{{ errors.password }}</div>
+
+            <label for="confirm-password">Confirm Password</label>
+            <div class="password-wrapper">
+                <input type="password" id="confirm-password" v-model="confirmPassword" @input="validateConfirmPassword" placeholder="Confirm your password">
+                <i :class="showConfirmPassword ? 'fas fa-eye-slash' : 'fas fa-eye'" class="toggle-password" @click="toggleConfirmPassword"></i>
+            </div>
+            <div class="error" v-if="errors.confirmPassword">{{ errors.confirmPassword }}</div>
+
+            <button :disabled="!isFormValid || isAnyFieldEmpty" @click="submitUser">Register</button>
+
+            
+            <p class="have-account">Have an account? <a href="public/login.html">Login here</a></p>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 MindAid by Amay W. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                role: '',
+                fullName: '',
+                username: '',
+                email: '',
+                dob: '',
+                password: '',
+                confirmPassword: '',
+                showPassword: false,
+                showConfirmPassword: false,
+                listofusernames: [],
+                errors: {
+                    fullName: '',
+                    username: '',
+                    email: '',
+                    dob: '',
+                    password: '',
+                    confirmPassword: ''
+                }
+
+            },
+            computed: {
+                isFormValid() {
+                    return (
+                        this.role &&
+                        !this.errors.fullName &&
+                        !this.errors.username &&
+                        !this.errors.email &&
+                        !this.errors.dob &&
+                        !this.errors.password &&
+                        !this.errors.confirmPassword
+                    );
+                },
+                isAnyFieldEmpty() {
+                    return !this.fullName || !this.username || !this.email || !this.dob || !this.password || !this.confirmPassword;
+                },
+
+            
+            },
+            beforeMount(){
+                this.fetchtakenUsernames()
+
+            },
+
+
+            methods: {
+
+                setRole(role) {
+                    this.role = role;
+                },
+
+
+                fetchtakenUsernames() {
+                    fetch('http://localhost:3000/collection/users', {
+                        method: 'GET', // HTTP method
+                        headers: {
+                            'Content-Type': 'application/json', // Data type
+                        },
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        return response.json(); // Parse the JSON body
+                    })
+                    .then(data => {
+                        this.listofusernames = data.map(profile => profile.username); // Access the username field
+                    })
+                    .catch(error => {
+                        console.error("Error fetching usernames: ", error);
+                    });
+                },
+
+
+
+
+                validateFullName() {
+                    const namePattern = /^[a-zA-Z\s]+$/;
+                    this.errors.fullName = !namePattern.test(this.fullName) ? 'Full Name must contain only letters and spaces.' : '';
+                },
+
+                isUsernameTaken() {
+                    let status = false;
+                    let message = "";
+
+                    for (const element of this.listofusernames) {
+                        if (this.username === element) { // Compare with the username directly
+                            status = true;
+                            message = "Username Taken";
+                            break; // Exit the loop as soon as a match is found
+                        }
+                    }
+
+                    return { message, status };
+                },
+
+
+                async validateUsername() {
+                    const usernamePattern = /^(?!.*[.]{2})[a-zA-Z0-9._]{3,20}$/;
+                    
+                    if (!usernamePattern.test(this.username)) {
+                        this.errors.username = `Username must be 3-20 characters and can only contain letters, numbers, dots, and underscores.`;
+                        return;
+                    }
+                    if (this.isUsernameTaken().status) {
+                        this.errors.username = `${this.isUsernameTaken().message}`;
+                        return;
+                    }
+                    this.errors.username = '';
+                },
+
+                validateEmail() {
+                    const emailPattern = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+                    this.errors.email = emailPattern.test(this.email) ? '' : 'Enter a valid email address.';
+                },
+                validateDob() {
+                    this.errors.dob = this.dob ? '' : 'Date of Birth is required.';
+                },
+                validatePassword() {
+                    this.errors.password = this.password.length >= 8 ? '' : 'Password must be at least 8 characters long.';
+                },
+                validateConfirmPassword() {
+                    this.errors.confirmPassword = this.password === this.confirmPassword ? '' : 'Passwords do not match.';
+                },
+                togglePassword() {
+                    this.showPassword = !this.showPassword;
+                    const passwordField = document.getElementById('password');
+                    passwordField.type = this.showPassword ? 'text' : 'password';
+                },
+                toggleConfirmPassword() {
+                    this.showConfirmPassword = !this.showConfirmPassword;
+                    const confirmPasswordField = document.getElementById('confirm-password');
+                    confirmPasswordField.type = this.showConfirmPassword ? 'text' : 'password';
+                },
+                async submitUser() {
+                    const newUser = {
+                        fullName: this.fullName,
+                        username: this.username,
+                        email: this.email,
+                        dob: this.dob,
+                        password: this.password,
+                        role: this.role
+                    };
+
+                    try {
+                        await axios.post('http://localhost:3000/collection/users', newUser);
+                        alert('User registered successfully!');
+                        window.location.href = 'public/login.html';
+                    } catch (error) {
+                        console.error('Error registering user:', error);
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
